@@ -41,3 +41,7 @@
 *ssid*
 ssid*
 src/ssid*
+
+cpp-httplib
+cpp-httplib/*
+*cpp-httplib*
