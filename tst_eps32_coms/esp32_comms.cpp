@@ -1,4 +1,6 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
+
+//the http library httplib.h file is available from https://github.com/yhirose/cpp-httplib
 #include "httplib.h"
 #include <iostream>
 #include <fstream>
@@ -30,14 +32,14 @@ public:
 
     auto get_stuff(const std::string &qury)
     {
-        //"/control?var=m&val=100_200"
+        ///get_readings
         auto res = cli->Get(qury);
 
         return res;
     }
 
 private:
-    // httplib::Client cl2;
+    httplib::Client *cl2;
     std::shared_ptr<httplib::Client> cli; // Declare a shared pointer to httplib::Client
 };
 
@@ -60,9 +62,9 @@ int main(int argc, char *argv[])
     string out_file = "log.csv"; //default
 
     if (argc > 2){
-        out_file = argv[3];
+        out_file = argv[2];
     }
-
+    
     string message;
     ofstream logfile;
 
@@ -88,7 +90,7 @@ int main(int argc, char *argv[])
         }
 
         // Sleep until next reading
-        this_thread::sleep_for(chrono::seconds(10));
+        this_thread::sleep_for(chrono::seconds(1));
     }
 
     return 0;
