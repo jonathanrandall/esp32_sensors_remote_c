@@ -84,6 +84,7 @@ String getTime() {
   char timeStringBuff[64]; // Buffer to hold the formatted time
   strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
   String formattedTime = String(timeStringBuff);
+  Serial.println(formattedTime);
   // return now;
   return formattedTime;
 }

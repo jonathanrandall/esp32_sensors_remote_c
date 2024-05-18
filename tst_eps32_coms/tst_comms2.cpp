@@ -1,36 +1,38 @@
 #define CPPHTTPLIB_OPENSSL_SUPPORT
 #include "httplib.h"
 #include <iostream>
-//g++ -o ssl_client tst_comms2.cpp -lssl -lcrypto
+#include <fstream>
+#include <string>
+#include <chrono>
+#include <thread>
+
+// g++ -o ssl_client tst_comms2.cpp -lssl -lcrypto
 
 using namespace httplib;
 
-
 using namespace std;
 
+
+// mkdir build
 // cd build
-// make ..
+// cmake ..
 // make
 
 class Esp32Comms
 {
 public:
     Esp32Comms() = default;
-    // Constructor that takes the IP address and initializes httplib::Client
-    // Esp32Comms(const std::string &ip) : cli(std::make_shared<httplib::Client>(ip))
-    // {
-    //     // Additional initialization if needed
-    // }
 
-    void connect(const std::string &ip){
-        cli=(std::make_shared<httplib::Client>(ip));
+    void connect(const std::string &ip)
+    {
+        cli = (std::make_shared<httplib::Client>(ip));
     }
 
     auto get_stuff(const std::string &qury)
     {
         //"/control?var=m&val=100_200"
         auto res = cli->Get(qury);
-        
+
         return res;
     }
 
@@ -39,26 +41,55 @@ private:
     std::shared_ptr<httplib::Client> cli; // Declare a shared pointer to httplib::Client
 };
 
+int main(int argc, char *argv[])
+{
 
-int main(){
-    cout << "Hello World!\n";
-    // httplib::Client cli("esp32_ip");
-    
     Esp32Comms esp32;
-    
+    if (argc < 2)
+    {
+        cerr << "Usage: " << argv[0] << " <esp32 ip> [output file]\n default outfile is log.csv\n" << endl;
+        return 1;
+    }
+
+    string esp32_ip = argv[1];
     
 
-    esp32.connect("192.168.1.211");
-    auto res = esp32.get_stuff("/control?var=m&val=200_200");
-    res->status;
-    res->body;
-    cout << "res->status " << res->status << "\n";
-    cout << "res->body " << res->body << "\n";
+    esp32.connect(esp32_ip);
 
-    auto res0 = esp32.get_stuff("/control?var=e&val=0_0");
-    res0->status;
-    res0->body;
-    cout << "res->status " << res0->status << "\n";
-    cout << "res->body " << res0->body << "\n\n";
+    //define output file
+    string out_file = "log.csv"; //default
+
+    if (argc > 2){
+        out_file = argv[3];
+    }
+
+    string message;
+    ofstream logfile;
+
+    while (true)
+    {
+        auto res = esp32.get_stuff("/get_readings");
+        if(res->status==200){
+            message = res->body;
+        } else {
+            message = "no data recieved";
+        }
+        
+        cout << "status: " << res->status << "\n";
+        cout << "message: " << message << "\n";
+
+        logfile.open(out_file, ios_base::app); // Open in append mode
+        if (logfile.is_open()) {
+            logfile << message << endl; // Write message to the file
+            logfile.close();
+        } else {
+            cerr << "Unable to open file for writing" << endl;
+            return 1; // Exit if unable to open file
+        }
+
+        // Sleep until next reading
+        this_thread::sleep_for(chrono::seconds(10));
+    }
+
     return 0;
 }

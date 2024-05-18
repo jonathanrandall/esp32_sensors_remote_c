@@ -45,3 +45,7 @@ src/ssid*
 cpp-httplib
 cpp-httplib/*
 *cpp-httplib*
+
+build
+build/*
+*build/*
