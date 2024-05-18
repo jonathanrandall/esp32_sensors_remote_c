@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    httplib::Client *cl2;
+    // httplib::Client *cl2;
     std::shared_ptr<httplib::Client> cli; // Declare a shared pointer to httplib::Client
 };
 
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
     while (true)
     {
         auto res = esp32.get_stuff("/get_readings");
+        //use "/get_readings?var=meaning_of_life&val=42" to send values and variables to the esp32.
         if(res->status==200){
             message = res->body;
         } else {
@@ -90,7 +91,7 @@ int main(int argc, char *argv[])
         }
 
         // Sleep until next reading
-        this_thread::sleep_for(chrono::seconds(1));
+        this_thread::sleep_for(chrono::seconds(60));
     }
 
     return 0;
